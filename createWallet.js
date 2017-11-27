@@ -1,33 +1,45 @@
 'use strict';
 
-const bcoin = require('bcoin');
-const config = require('./config');
+const readline = require('readline');
+const fs       = require('fs');
+const bitcore  = require('bitcore-lib');
+const wallet = [];
 
-const WalletDB = bcoin.walletdb;
-const keyring  = bcoin.keyring;
+let counter = 0;
 
-bcoin.set(config.network);
+const rl = readline.createInterface({
+  input: fs.createReadStream('privateKeys.out')
+});
 
-const walletdb = new WalletDB({
-  db: 'leveldb',
-  network: config.network,
-  location: process.env.HOME + '/wdb'
- });
+// Each line is a WIF key
+rl.on('line', async (line) => {
+  counter++;
 
-(async () => {
-  await walletdb.open();
+  let key = bitcore.PrivateKey.fromWIF(line);
+  let addr = key.toAddress();
 
-  let wallet = await walletdb.get(config.id);
-
-  if (!wallet) {
-    wallet = await walletdb.create(config);
-    console.log('Wallet created')
+  let data = {
+    privKey: key.toString('hex'),
+    wif: line,
+    addr: addr.toString()
   }
 
-  console.log('Wallet ID: ' + wallet.id);
-  console.log('Wallet network: ' + wallet.network);
+  wallet.push(data)
 
-})().catch((err) => {
-  console.error(err.stack);
-  process.exit(1);
+  if (counter % 100 === 0) {
+    console.log(`Importing key #${counter}`);
+  }
+  //console.log(data)
 });
+
+rl.on('close', () => {
+  console.log(`Imported ${counter} keys`);
+
+  console.log('Writing wallet.json');
+  fs.writeFile("./wallet.json", JSON.stringify({wallet: wallet}), (err) => {
+    if (err) {
+      throw new Error(err);
+    }
+    console.log('Finished writing wallet.json');
+  })
+})

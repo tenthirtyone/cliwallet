@@ -1,3 +1,8 @@
+privateKeys.out
+utxos.json
+wallet.json
+wallet.out
+
 # Logs
 logs
 *.log

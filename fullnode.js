@@ -2,6 +2,17 @@
 
 const bcoin = require('bcoin');
 const FullNode = bcoin.fullnode;
+const app = require('http').createServer(handler)
+const io = require('socket.io')(app);
+const fs = require('fs');
+
+
+app.listen(3000);
+
+function handler(req, res) {
+  res.writeHead(200);
+  res.end();
+}
 
 const node = new FullNode({
   network: 'regtest',
@@ -21,6 +32,24 @@ const node = new FullNode({
   await node.connect();
 
   node.startSync();
+
+  io.on('connection', (socket) => {
+    console.log('connection');
+
+    socket.on('queue:addr', async (data) => {
+      let coins = await node.getCoinsByAddress(data.addr);
+      coins.forEach(utxo => {
+        utxo.addr = data.addr;
+        socket.emit('send:utxo', {
+          utxo: utxo,
+          addr: data.addr,
+        });
+      });
+      socket.emit('complete');
+    });
+  });
+
+
 })().catch((err) => {
   console.error(err.stack);
   process.exit(1);
