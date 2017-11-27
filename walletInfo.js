@@ -27,7 +27,7 @@ const walletdb = new WalletDB({
 
   const addresses = await wallet.getAddressHashes();
 
-  console.log(`There are ${addresses.length} addresses in the wallet`);
+  console.log(`There are ${addresses.length} private keys in the wallet`);
 
 })().catch((err) => {
   console.error(err.stack);

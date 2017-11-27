@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "bcoin": "git://github.com/bitpay/bcoin.git",
+    "bitcore-lib": "^0.15.0",
     "request": "^2.83.0"
   }
 }

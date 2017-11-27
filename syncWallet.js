@@ -37,6 +37,15 @@ let tx = bcoin.primitives.TX.fromRaw(raw);
   await walletdb.addTX(tx);
   console.log('adding tx');
 
+  let pendingTx = await wallet.getPending()
+
+  pendingTx.forEach(record => {
+    record.tx.outputs.forEach(output => {
+      console.log(output)
+      console.log(output.toRaw().toString('hex'))
+    })
+  })
+
   wallet.on('balance', (balance) => {
     console.log('Balance updated.');
     console.log(bcoin.amount.btc(balance.unconfirmed));
