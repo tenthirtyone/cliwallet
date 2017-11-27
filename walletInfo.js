@@ -20,18 +20,12 @@ const walletdb = new WalletDB({
   let wallet = await walletdb.get(config.id);
 
   if (!wallet) {
-    wallet = await walletdb.create(config);
-    console.log('Wallet created')
+    throw new Error('Wallet ' + config.id + ' not found');
   }
 
   console.log('Wallet ID: ' + wallet.id);
 
   const addresses = await wallet.getAddressHashes();
-
-
-  addresses.forEach(address => {
-    console.log(address);
-  })
 
   console.log(`There are ${addresses.length} addresses in the wallet`);
 
