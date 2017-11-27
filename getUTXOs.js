@@ -73,5 +73,6 @@ function saveUTXOs() {
       throw new Error(err);
     }
     console.log('Finished writing utxos.json');
-  })
+  });
+  socket.close();
 }
